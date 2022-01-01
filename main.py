@@ -2,6 +2,9 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 import pprint
+import os
+
+import csvTableWriter
 
 root_url = "https://eschome.net/"
 
@@ -35,9 +38,13 @@ class Page:
             #print("^^^")
             r = requests.post(self.url, data = post_data)
 
-            text_file = open(self.path.removeprefix("./").removesuffix(".php") + f"-{page_count}.html", "w")
+            # write html
+            text_file = open(f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.html", "w")
             n = text_file.write(r.text)
             text_file.close()
+
+            # write csv
+            csvTableWriter.writeCsv(f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.csv", r.text, post_data)
 
             # scary block to ensure all combinations of options are iterated    
             last_option = self.options[len(self.options) - 1]
@@ -56,12 +63,16 @@ class Page:
                         finished = True
                     i = i - 1
             page_count = page_count + 1
+        print(f"Saved all combinations of {self.url}.")
 
 r = requests.get(root_url)
 
 soup = BeautifulSoup(r.text, 'html.parser')
 
 rows = soup.find_all("tr", "tr_home_tabelle_1")
+
+if not os.path.exists('results'):
+    os.makedirs('results')
 
 for row in rows:
     page = Page()
