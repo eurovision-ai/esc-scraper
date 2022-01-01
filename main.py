@@ -33,18 +33,28 @@ class Page:
 
             for option in self.options:
                 post_data[option.name] = option.values[counts[option]].value
-            #print("vvv")
-            #pprint.pprint(post_data)
-            #print("^^^")
-            r = requests.post(self.url, data = post_data)
 
-            # write html
-            text_file = open(f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.html", "w")
-            n = text_file.write(r.text)
-            text_file.close()
+            html_file_name = f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.html"
+            html_text = None
+            csv_file_name = f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.csv"
+
+            if not os.path.exists(html_file_name):
+                #print("vvv")
+                #pprint.pprint(post_data)
+                #print("^^^")
+                r = requests.post(self.url, data = post_data)
+                html_text = r.text
+
+                # write html
+                with open(html_file_name, "w") as text_file:
+                    text_file.write(html_text)
 
             # write csv
-            csvTableWriter.writeCsv(f"results/{self.path.removeprefix('./').removesuffix('.php')}-{page_count}.csv", r.text, post_data)
+            if not os.path.exists(csv_file_name):
+                if (html_text == None):
+                    with open(html_file_name) as f:
+                        html_text = f.read()
+                csvTableWriter.writeCsv(csv_file_name, html_text, post_data)
 
             # scary block to ensure all combinations of options are iterated    
             last_option = self.options[len(self.options) - 1]
