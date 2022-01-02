@@ -22,7 +22,35 @@ class Page:
     options: List[Option]
 
     def save_all_data(self):
-        print(f"Beginning all combinations of {self.url}.")
+
+        print(f"Finding combinations of {self.url}.")
+        combinations_found = False
+        combinations = 0
+        counts = {}
+        for last_option in self.options:
+            counts[last_option] = 0
+        if len(self.options) > 0:
+            while(not combinations_found):
+                last_option = self.options[len(self.options) - 1]
+                counts[last_option] = counts[last_option] + 1
+                if counts[last_option] == len(last_option.values):
+                    counts[last_option] = 0
+                    i = len(self.options) - 2
+                    if i < 0:
+                        combinations_found = True
+                    while i >= 0:
+                        next_option = list(counts.keys())[i]
+                        counts[next_option] = counts[next_option] + 1
+                        if counts[next_option] == len(next_option.values):
+                            counts[next_option] = 0
+                        else:
+                            break
+                        if i == 0:
+                            combinations_found = True
+                        i = i - 1
+                combinations = combinations + 1
+
+        print(f"Beginning {combinations} combinations of {self.url}.")
         counts = {}
         for last_option in self.options:
             counts[last_option] = 0
@@ -57,12 +85,17 @@ class Page:
                         html_text = f.read()
                 csvTableWriter.writeCsv(csv_file_name, html_text, post_data)
 
+            if len(self.options) == 0:
+                finished = True
+                continue
             # scary block to ensure all combinations of options are iterated    
             last_option = self.options[len(self.options) - 1]
             counts[last_option] = counts[last_option] + 1
             if counts[last_option] == len(last_option.values):
                 counts[last_option] = 0
                 i = len(self.options) - 2
+                if i < 0:
+                    finished = True
                 while i >= 0:
                     next_option = list(counts.keys())[i]
                     counts[next_option] = counts[next_option] + 1
@@ -131,16 +164,12 @@ for row in rows:
             option_list_value.value = str(opt)
             option_list_value.text = str(opt)
             option_list.values.append(option_list_value)
-            print(f"YEAR TO {opt} -- ")
-            pprint.pprint(option_list_value)
         elif select_name == "year_to":
             opt = max(int(opt["value"]) for opt in select.find_all("option"))
             option_list_value = Option()
             option_list_value.value = str(opt)
             option_list_value.text = str(opt)
             option_list.values.append(option_list_value)
-            print(f"YEAR TO {opt} -- ")
-            pprint.pprint(option_list_value)
         else:
             for option in select.find_all("option"):
                 option_list_value = Option()
