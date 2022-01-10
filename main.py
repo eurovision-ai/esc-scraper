@@ -7,6 +7,9 @@ import os
 import csvTableWriter
 
 root_url = "https://eschome.net/"
+headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0'
+}
 
 class OptionValue:
     value: str
@@ -71,7 +74,7 @@ class Page:
                 #print("vvv")
                 #pprint.pprint(post_data)
                 #print("^^^")
-                r = requests.post(self.url, data = post_data)
+                r = requests.post(self.url, data = post_data, headers=headers)
                 html_text = r.text
 
                 # write html
@@ -109,7 +112,9 @@ class Page:
             page_count = page_count + 1
         print(f"Saved all combinations {page_count} of {self.url}.")
 
-r = requests.get(root_url)
+print("Loading homepage...")
+r = requests.get(root_url, headers=headers)
+print("Homepage acquired")
 
 soup = BeautifulSoup(r.text, 'html.parser')
 

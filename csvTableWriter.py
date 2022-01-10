@@ -48,7 +48,8 @@ def writeCsv(file_output: str, html: str, extra):
 
             if append:
                 cleaned_headers.append(header)
-                indexes_to_use.append(index)        
+                indexes_to_use.append(index)
+
         cleaned_rows = []
         for r in rows:
             cleaned_row = []
@@ -72,10 +73,10 @@ def writeCsv(file_output: str, html: str, extra):
             spamwriter = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
             spamwriter.writerow([ title, pprint.pformat(extra) ])
             spamwriter.writerow(cleaned_headers)
-            for row in rows:
+            for row in cleaned_rows:
                 spamwriter.writerow(row)
 
 if __name__ == "__main__":
-    with open('results/databaseoutput205-94.html') as f:
+    with open('results/databaseoutput201-0.html') as f:
         html = f.read()
         writeCsv('test.csv', html, None)
