@@ -75,10 +75,11 @@ class Page:
                 #pprint.pprint(post_data)
                 #print("^^^")
                 r = requests.post(self.url, data = post_data, headers=headers)
-                html_text = r.text
+                # raw content instead of text because some unicode was being poorly converted.
+                html_text = str(r.content, 'utf-8')
 
                 # write html
-                with open(html_file_name, "w") as text_file:
+                with open(html_file_name, "w", encoding="utf-8") as text_file:
                     text_file.write(html_text)
 
             # write csv
